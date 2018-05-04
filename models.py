@@ -17,22 +17,26 @@ class Delivery(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     businesstype = db.Column(db.String(255), nullable=True)
     clientname = db.Column(db.String(225), nullable=True)
+    delivery_date =  db.Column(db.Date, nullable=True)
+    delivery_fee =  db.Column(db.String(225), nullable=True)
     # a unique id number for future use
     order_ID = db.Column(db.String(10), unique=True, nullable=True)
     ship_ID = db.relationship('Shippment', backref='Delivery',lazy='dynamic')
     comment = db.Column(db.Text, nullable=True)
     
 
-    def __init__(self, businesstype, clientname, order_ID, comment):
+    def __init__(self, businesstype, clientname, order_ID, delivery_date, delivery_fee, comment):
         self.businesstype = businesstype
         self.clientname = clientname
         self.order_ID = order_ID
+        self.delivery_date = delivery_date
+        self.delivery_fee = delivery_fee
         self.comment = comment
 
 class DeliverySchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ('timestamp', 'updated_at', 'businesstype', 'clientname', 'order_ID', 'comment')
+        fields = ('timestamp', 'updated_at', 'businesstype', 'clientname', 'order_ID', 'delivery_date','delivery_fee', 'comment')
 
 class Shippment(db.Model):
     """
@@ -48,7 +52,7 @@ class Shippment(db.Model):
     contact_info = db.Column(db.String(255), nullable=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     ship_orderStore = db.Column(db.String(255), nullable=True)
-    ship_datetime = db.Column(db.Date, nullable=True)
+    ship_datetime = db.Column(db.String(225), nullable=True)
     ship_area = db.Column(db.String(255), nullable=True)
     ship_district = db.Column(db.String(255), nullable=True)
     driver = db.Column(db.String(255), nullable=True)
@@ -60,7 +64,7 @@ class Shippment(db.Model):
     comment = db.Column(db.Text, nullable=True)
     
     
-    def __init__(self, ship_ID, order_ID, contact_info, ship_orderStore, ship_datetime, ship_area, ship_district, driver, car_type, car_ID, is_elevator, floors_byhand, amount_collect, comment):
+    def __init__(self, ship_ID, order_ID, contact_info, ship_orderStore, ship_datetime, ship_area, ship_district, driver, car_type, car_ID, is_elevator, floors_byhand, amount_collect, ship_comment):
         self.ship_ID = ship_ID
         self.order_ID = order_ID        
         self.contact_info = contact_info
@@ -74,7 +78,7 @@ class Shippment(db.Model):
         self.is_elevator = is_elevator
         self.floors_byhand = floors_byhand
         self.amount_collect = amount_collect
-        self.comment = comment
+        self.comment = ship_comment
  
 class ShippmentSchema(ma.Schema):
     class Meta:

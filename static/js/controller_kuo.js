@@ -226,26 +226,28 @@ myApp.controller('formCtrl', function($scope,$http) {
                 }
             }
             var shipdata = {
-                business_type: business_type,
-                delivery_date: delivery_date,
-                driver: x.ship_driver,
-                car_type: car_type,
-                order_ID: order_ID,
-                delivery_fee: delivery_fee,                    
-                order_comment: comment,
-                ship_ID: x.ship_ID,
-                ship_orderstore: x.ship_orderStore, //發單門市
-                ship_area: x.ship_area,
-                ship_district: x.ship_district,
-                ship_datetime: x.ship_datetime,                    
-                contact_info: x.contact_info,
-                is_elevator: x.is_elevator,
-                floors_byhand: x.floors_byhand,
-                amount_collect: x.amount_collect,
-                ship_comment: x.comment 
+                businesstype: business_type,                    //單據類別
+                clientname: "",                                 //客戶名稱(保留)
+                car_ID: "",                                     //車號(保留) 
+                order_ID: order_ID,                             //出貨單號
+                delivery_date: delivery_date,                   //出車日期
+                car_type: car_type,                             //車型 
+                comment: comment,                               //出貨備註
+                ship_ID: x.ship_ID,                             //送貨單號
+                ship_orderStore: x.ship_orderStore,             //發單門市
+                ship_area: x.ship_area,                         //送貨縣市
+                ship_district: x.ship_district,                 //送貨區域
+                ship_datetime: x.ship_datetime,                 //指定時間
+                delivery_fee: delivery_fee.toString(),          //價格
+                driver: x.ship_driver,                          //駕駛   
+                contact_info: x.contact_info,                   //客戶姓名(聯絡方式)
+                is_elevator: x.is_elevator.toString(),          //是否需要用電梯搬運
+                floors_byhand: x.floors_byhand.toString(),      //是否需要用手搬運
+                amount_collect: x.amount_collect.toString(),    //預收款
+                ship_comment: x.comment                         //送貨單備註
             }
             try{
-                var TYPE1_SUBMIT_FORM_API = "http://localhost/shippment";
+                var TYPE1_SUBMIT_FORM_API = "http://localhost/order";
                 //var TYPE1_SUBMIT_FORM_API = "1BkAwzqNbd5eVvJkFBzGRXFu0ESWZ9Gdmw4HmtdYMM38";
                 $http({
                     url:TYPE1_SUBMIT_FORM_API,                         
@@ -253,7 +255,7 @@ myApp.controller('formCtrl', function($scope,$http) {
                     data: shipdata,
                     headers:{'Content-Type': 'application/json'}
                 })
-                .success(function(response) {
+                .then(function(response) {
                     if (response.status === 200) {
                         return;
                     } 

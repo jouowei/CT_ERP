@@ -52,7 +52,9 @@ def add_order():
     new_delivery = Delivery(
         request.json['businesstype'], 
         request.json['clientname'], 
-        request.json['order_ID'],  
+        request.json['order_ID'],
+        request.json['delivery_date'],
+        request.json['delivery_fee'],
         request.json['comment'])
     new_shippment = Shippment(
         request.json['ship_ID'],
@@ -68,7 +70,7 @@ def add_order():
         request.json['is_elevator'],
         request.json['floors_byhand'],
         request.json['amount_collect'],
-        request.json['comment']
+        request.json['ship_comment']
     )
     
     result_del = Delivery.query.filter_by(order_ID=request.json['order_ID']).first()
@@ -92,9 +94,10 @@ def add_delivery():
     businesstype = request.json['businesstype']
     clientname = request.json['clientname']
     order_ID = request.json['order_ID']
+    delivery_date = request.json['delivery_date'] 
     comment = request.json['comment']
 
-    new_delivery = Delivery(businesstype, clientname, order_ID, comment)
+    new_delivery = Delivery(businesstype, clientname, order_ID, delivery_date, comment)
 
     db.session.add(new_delivery)
     db.session.commit()
@@ -141,6 +144,16 @@ def delivery_update(id):
     except:
         pass
     try:
+        delivery_date = request.json['delivery_date']
+        delivery.delivery_date = delivery_date    
+    except:
+        pass
+    try:
+        delivery_fee = request.json['delivery_fee']
+        delivery.delivery_date = delivery_fee    
+    except:
+        pass
+    try:
         comment = '\ new comment' + request.json['comment']
         delivery.comment += comment
     except:
@@ -176,7 +189,7 @@ def add_shippment():
         request.json['is_elevator'],
         request.json['floors_byhand'],
         request.json['amount_collect'],
-        request.json['comment']
+        request.json['ship_comment']
     )
 
     db.session.add(new_shippment)
@@ -275,7 +288,7 @@ def shippment_update(id):
         pass
 
     try:
-        comment = '/ Comment: ' + request.json['comment']
+        comment = '/ Comment: ' + request.json['ship_comment']
         shippment.comment += comment
     except:
         pass
