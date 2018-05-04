@@ -48,6 +48,7 @@ def dbupgrade():
 # endpoint to create new delivery entry
 @app.route("/order", methods=["POST"])
 def add_order():
+
     new_delivery = Delivery(
         request.json['businesstype'], 
         request.json['clientname'], 
@@ -69,13 +70,21 @@ def add_order():
         request.json['amount_collect'],
         request.json['comment']
     )
-
-    db.session.add(new_delivery)
-    db.session.commit()
-    db.session.add(new_shippment)
-    db.session.commit()
-
-    return '{}'.format(new_delivery)
+    
+    result_del = Delivery.query.filter_by(order_ID=request.json['order_ID']).first()
+    result_ship = Shippment.query.filter_by(ship_ID=request.json['ship_ID']).first()
+    if result_del is None:
+        db.session.add(new_delivery)
+        db.session.commit()
+        db.session.add(new_shippment)
+        db.session.commit()
+        return '{}'.format(new_shippment)
+    elif result_ship is None: 
+        db.session.add(new_shippment)
+        db.session.commit()
+        return '{}'.format(new_shippment)
+    else:
+        return 'this shippment is already exist'
 
 # endpoint to create new delivery entry
 @app.route("/delivery", methods=["POST"])

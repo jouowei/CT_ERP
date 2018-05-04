@@ -19,8 +19,7 @@ class Delivery(db.Model):
     clientname = db.Column(db.String(225), nullable=True)
     # a unique id number for future use
     order_ID = db.Column(db.String(10), unique=True, nullable=True)
-    ship_ID = db.relationship('Shippment', backref='Delivery',
-                                lazy='dynamic')
+    ship_ID = db.relationship('Shippment', backref='Delivery',lazy='dynamic')
     comment = db.Column(db.Text, nullable=True)
     
 
