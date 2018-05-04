@@ -28,9 +28,9 @@ env_variables:
     # mysql://[username]:[password]@/[SQLinstanceName]?unix_socket=/cloudsql/[connectionName]
     # connectName will be something like project1:us-central1:instance1
     SQLALCHEMY_DATABASE_URI: >-
-      mysql://root:user@/briantesting?unix_socket=/cloudsql/reviewpro-1503537903770:asia-east1:shipping
+      mysql://ctdb1:750111@/company?unix_socket=/cloudsql/ct-erp:asia-east1:ctdb1
 # [END env_variables]
 
 beta_settings:
     # replace with your connectionName [project1:us-central1:instance1]
-    cloud_sql_instances: reviewpro-1503537903770:asia-east1:shipping
+    cloud_sql_instances: ct-erp:asia-east1:ctdb1

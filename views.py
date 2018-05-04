@@ -10,6 +10,17 @@ deliveries_schema = DeliverySchema(many=True)
 shippment_schema = ShippmentSchema()
 shippments_schema = ShippmentSchema(many=True)
 
+# Main landing page
+@app.route("/")
+def homepage():
+    """
+    Render the homepage template on the / route
+    """
+    try:
+        return render_template('index.html', title="Welcome")
+    except:
+        return 'Cannot load file specified'
+
 # url to initiate flask migration
 @app.route('/admin/dbinit')
 def dbinit():
@@ -33,16 +44,38 @@ def dbupgrade():
     except Exception as e: 
         return str(e)
 
-# Main landing page
-@app.route("/")
-def homepage():
-    """
-    Render the homepage template on the / route
-    """
-    try:
-        return render_template('index.html', title="Welcome")
-    except:
-        return 'Cannot load file specified'
+
+# endpoint to create new delivery entry
+@app.route("/order", methods=["POST"])
+def add_order():
+    new_delivery = Delivery(
+        request.json['businesstype'], 
+        request.json['clientname'], 
+        request.json['order_ID'],  
+        request.json['comment'])
+    new_shippment = Shippment(
+        request.json['ship_ID'],
+        request.json['order_ID'],  
+        request.json['contact_info'],
+        request.json['ship_orderStore'],
+        request.json['ship_datetime'],
+        request.json['ship_area'],
+        request.json['ship_district'],
+        request.json['driver'],
+        request.json['car_type'],
+        request.json['car_ID'],
+        request.json['is_elevator'],
+        request.json['floors_byhand'],
+        request.json['amount_collect'],
+        request.json['comment']
+    )
+
+    db.session.add(new_delivery)
+    db.session.commit()
+    db.session.add(new_shippment)
+    db.session.commit()
+
+    return '{}'.format(new_delivery)
 
 # endpoint to create new delivery entry
 @app.route("/delivery", methods=["POST"])
@@ -122,7 +155,10 @@ def delivery_delete(id):
 def add_shippment():
     new_shippment = Shippment(
         request.json['ship_ID'],
+        request.json['order_ID'],  
         request.json['contact_info'],
+        request.json['ship_orderStore'],
+        request.json['ship_datetime'],
         request.json['ship_area'],
         request.json['ship_district'],
         request.json['driver'],
@@ -155,11 +191,29 @@ def shippment_detail(id):
 # endpoint to update shippment entry by order id
 @app.route("/shippment/<id>", methods=["PUT", "POST"])
 def shippment_update(id):
-    shippment = Shippment.query.filter_by(ship_ID=id).first()
+    shippment = Shippment.query.filter_by(order_ID=id).first()
 
     try:
         contact_info = request.json['contact_info']
         shippment.contact_info = contact_info
+    except:
+        pass
+
+    try:
+        ship_ID = request.json['ship_ID']
+        shippment.ship_ID = ship_ID
+    except:
+        pass
+
+    try:
+        ship_orderStore = request.json['ship_orderStore']
+        shippment.ship_orderStore = ship_orderStore
+    except:
+        pass
+
+    try:
+        ship_datetime = request.json['ship_datetime']
+        shippment.ship_datetime = ship_datetime
     except:
         pass
 
