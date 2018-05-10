@@ -41,8 +41,6 @@ myApp.controller('formCtrl', function($scope,$http) {
     $scope.rawdata = rawdata;
     $scope.arriveAfter = arriveAfter;
     $scope.arriveBefore = arriveBefore;
-
-    
     $scope.setQuery = function(query) {
         $scope.query = query;
         $scope.focus = false;
@@ -247,7 +245,8 @@ myApp.controller('formCtrl', function($scope,$http) {
                 ship_comment: x.comment                         //送貨單備註
             }
             try{
-                var TYPE1_SUBMIT_FORM_API = "http://localhost/order";
+                var TYPE1_SUBMIT_FORM_API = "https://ct-erp.appspot.com/order";
+                //var TYPE1_SUBMIT_FORM_API = "http://localhost/order";
                 //var TYPE1_SUBMIT_FORM_API = "1BkAwzqNbd5eVvJkFBzGRXFu0ESWZ9Gdmw4HmtdYMM38";
                 $http({
                     url:TYPE1_SUBMIT_FORM_API,                         
