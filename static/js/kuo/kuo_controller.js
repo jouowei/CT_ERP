@@ -35,6 +35,7 @@ myApp.directive('customAutofocus', function() {
 //資料控制部分
 myApp.controller('formCtrl', function($scope,$http) {
     $scope.order = order;
+    $scope.order.businesstype = "郭元益";
     $scope.order.ships = ships;
     $scope.order_store = order_store;
     $scope.drivers = drivers;
@@ -84,6 +85,7 @@ myApp.controller('formCtrl', function($scope,$http) {
     //刪除一筆送貨單
     $scope.deleteShip = function (ship) {
         ship.ship_deleted = "1";
+        $scope.focusIndex = $scope.order.ships.length;
     };
     //新增一筆送貨單
     $scope.addNewShip = function(){
@@ -106,6 +108,12 @@ myApp.controller('formCtrl', function($scope,$http) {
         };
         $scope.order.ships.push(ship);
         $scope.focusIndex = $scope.order.ships.length-1;
+        $("ship_district").attr("disabled", "disabled");
+        $scope.order.ships.forEach(function(x,index){         
+            if(x.ship_deleted === "1" ){
+                $scope.focusIndex = $scope.focusIndex-1;
+            }
+        });
     };
 
     $scope.customFilter = function(obj){
@@ -132,9 +140,18 @@ myApp.controller('formCtrl', function($scope,$http) {
                     if(errormsg.length > 0){errormsg += "\n";}
                     errormsg += '請確認發單門市';
                 }                
-                if (x.ship_ID == null || x.ship_ID.length == 0){
-                    if(errormsg.length > 0){errormsg += "\n";}
-                    errormsg += '請確認送貨單號';
+                if (x.ship_ID == null || x.ship_ID.length == 0 || x.ship_ID.length != 14){
+                    if (x.ship_ID == "自取"){
+                        x.ship_ID = "自取"+ randomWord(12);
+                    }
+                    else if (x.ship_ID.length != 14){
+                        if(errormsg.length > 0){errormsg += "\n";}
+                        errormsg += '送貨單號長度錯誤';
+                    }
+                    else{
+                        if(errormsg.length > 0){errormsg += "\n";}
+                        errormsg += '請確認送貨單號';
+                    } 
                 }
                 if(x.ship_driver == null ||  x.ship_driver.length == 0) {
                     if(errormsg.length > 0){errormsg += "\n";}
@@ -169,7 +186,7 @@ myApp.controller('formCtrl', function($scope,$http) {
                 else if(x.floors_byhand > 0){ 
                     floor = floor + parseInt(x.floors_byhand); 
                     if(x.comment.length > 0){x.comment += '\n'}
-                    x.comment += '需手搬'+x.floors_byhand+'層樓。';
+                    x.comment += '手搬到'+x.floors_byhand+'樓。';
                 }
                 if (x.amount_collect == null || x.amount_collect.length == 0){
                     if(errormsg.length > 0){errormsg += "\n";}
@@ -188,6 +205,8 @@ myApp.controller('formCtrl', function($scope,$http) {
         })
         if(errormsg.length == 0 ){
         //計價公式
+            if (floor > 0)
+                floor = floor - 1;
             order.delivery_fee = Math.max.apply(null, basic_fee) + 100 * (basic_fee.length - 1 + floor + elevator)
             $('#fee_result').val(order.delivery_fee);
             $('#commentText').val(comment);
@@ -205,70 +224,45 @@ myApp.controller('formCtrl', function($scope,$http) {
         $("input[type=text]").attr("disabled", "disabled");
         $("input[type=select]").attr("disabled", "disabled");
         
-        var business_type = "郭元益";
-        var delivery_date =  $('#datepicker').val();
-        var order_ID = $scope.order.order_ID;
-        var car_type = $scope.order.car_type;
-        var delivery_fee = $scope.order.delivery_fee;
-        var comment = $('#commentText').val();
-        $scope.order.ships.forEach(function(x){
-            if(x.ship_deleted == "1" ){
-                return;
+        /*
+        var SUBMIT_ORDER_API = "https://ct-erp.appspot.com/order";
+        var SUBMIT_ORDER_API = "https://jt-erp.appspot.com/order";
+        */
+        var SUBMIT_ORDER_API = "http://localhost/order";
+        var submitOrder;
+        submitOrder = order;
+        submitOrder.delivery_date = $('#datepicker').val();
+        submitOrder.comment = $('#commentText').val();
+        submitOrder.delivery_fee = $('#fee_result').val();
+        $scope.order.ships.forEach(function(x,index){         
+            if(x.ship_deleted === "1" ){
+                submitOrder.ships.splice(index,1)
             }
-            if(comment.length > 0){
-                if(x.comment.length > 0 && x.comment !== null){
-                    x.comment += "\n註:"+comment;
-                }
-                else if(x.comment.length == 0){
-                    x.comment ="註:"+comment;
-                }
-            }
-            var shipdata = {
-                businesstype: business_type,                    //單據類別
-                clientname: "",                                 //客戶名稱(保留)
-                car_ID: "",                                     //車號(保留) 
-                order_ID: order_ID,                             //出貨單號
-                delivery_date: delivery_date,                   //出車日期
-                car_type: car_type,                             //車型 
-                comment: comment,                               //出貨備註
-                ship_ID: x.ship_ID,                             //送貨單號
-                ship_orderStore: x.ship_orderStore,             //發單門市
-                ship_area: x.ship_area,                         //送貨縣市
-                ship_district: x.ship_district,                 //送貨區域
-                ship_datetime: x.ship_datetime,                 //指定時間
-                delivery_fee: delivery_fee.toString(),          //價格
-                driver: x.ship_driver,                          //駕駛   
-                contact_info: x.contact_info,                   //客戶姓名(聯絡方式)
-                is_elevator: x.is_elevator.toString(),          //是否需要用電梯搬運
-                floors_byhand: x.floors_byhand.toString(),      //是否需要用手搬運
-                amount_collect: x.amount_collect.toString(),    //預收款
-                ship_comment: x.comment                         //送貨單備註
-            }
-            try{
-                var TYPE1_SUBMIT_FORM_API = "https://ct-erp.appspot.com/order";
-                //var TYPE1_SUBMIT_FORM_API = "http://localhost/order";
-                //var TYPE1_SUBMIT_FORM_API = "1BkAwzqNbd5eVvJkFBzGRXFu0ESWZ9Gdmw4HmtdYMM38";
-                $http({
-                    url:TYPE1_SUBMIT_FORM_API,                         
-                    method: 'POST',
-                    data: shipdata,
-                    headers:{'Content-Type': 'application/json'}
-                })
-                .then(function(response) {
-                    if (response.status === 200) {
-                        return;
-                    } 
-                    else {
-                        return alert('網路連線問題，請再試一次 \n'+ response.data);
+        });
+        try{
+            $http({
+                url: SUBMIT_ORDER_API,                         
+                method: "POST",
+                data: submitOrder,
+                headers:{'Content-Type': 'application/json','Access-Control-Allow-Origin': '*' }
+            })
+            .then(function(response) {
+                if (response.status === 200) {
+                	alert(response.data);
+                    if (response.data === "新增成功"){
+                        setTimeout(function(){ location.reload(); }, 2000);
                     }
-                });
-            }
-            catch(err){
-                return alert('系統出現問題，請重新整理網頁後再試一次 \n'+err);
-            }
-    
-        });    
-        alert('新增成功');   
-        setTimeout(function(){ location.reload(); }, 2000);
+                } 
+                else {
+                    throw '系統出現問題，請通知工程師處理 "level:1" \n'+ response.data;
+                }
+            },
+            function errorCallback(response) {
+                return alert('系統出現問題，請通知工程師處理 \n'+response.data);
+            });
+        }
+        catch(err){
+            return alert(err);
+        }
     };
 });

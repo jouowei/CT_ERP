@@ -13,14 +13,27 @@ libraries:
 
 # Handlers define how to route requests to your application.
 handlers:
+
 - url: /(.*\.js)
   mime_type: text/javascript
   static_files: static/\1
   upload: static/(.*\.js)
+      
+- url: /kuo.html
+  static_files: templates/\kuo.html
+  upload : kuo.html
 
-- url: .* # This regex directs all routes to main.app
+- url: /lianhua.html
+  static_files: templates/\lianhua.html
+  upload : lianhua.html
+
+- url: /index.html
+  static_files: templates/\index.html
+  upload : index.html
+
+- url: /.* # This regex directs all routes to main.app
   script: main.app
-
+  
 # [START env_variables]
 env_variables:
     # Replace user, password, database, and instance connection name with the values obtained
@@ -29,6 +42,7 @@ env_variables:
     # connectName will be something like project1:us-central1:instance1
     SQLALCHEMY_DATABASE_URI: >-
       mysql://ctdb1:750111@104.155.195.75/company?unix_socket=/cloudsql/ct-erp:asia-east1:ctdb1
+      # mysql://ctdb1:750111@35.201.139.171/company?unix_socket=/cloudsql/jt-erp:asia-east1:ctdb1
 # [END env_variables]
 
 beta_settings:

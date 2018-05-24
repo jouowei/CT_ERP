@@ -19,24 +19,26 @@ class Delivery(db.Model):
     clientname = db.Column(db.String(225), nullable=True)
     delivery_date =  db.Column(db.Date, nullable=True)
     delivery_fee =  db.Column(db.String(225), nullable=True)
+    good_size =  db.Column(db.String(225), nullable=True)
     # a unique id number for future use
-    order_ID = db.Column(db.String(10), unique=True, nullable=True)
+    order_ID = db.Column(db.String(15), unique=True, nullable=True)
     ship_ID = db.relationship('Shippment', backref='Delivery',lazy='dynamic')
     comment = db.Column(db.Text, nullable=True)
     
 
-    def __init__(self, businesstype, clientname, order_ID, delivery_date, delivery_fee, comment):
+    def __init__(self, businesstype, order_ID, clientname="", delivery_date="", delivery_fee="",good_size="", comment=""):
         self.businesstype = businesstype
         self.clientname = clientname
         self.order_ID = order_ID
         self.delivery_date = delivery_date
         self.delivery_fee = delivery_fee
+        self.good_size = good_size
         self.comment = comment
 
 class DeliverySchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ('timestamp', 'updated_at', 'businesstype', 'clientname', 'order_ID', 'delivery_date','delivery_fee', 'comment')
+        fields = ('timestamp', 'updated_at', 'businesstype', 'clientname', 'order_ID', 'delivery_date','delivery_fee','good_size', 'comment')
 
 class Shippment(db.Model):
     """
@@ -46,8 +48,8 @@ class Shippment(db.Model):
     __tablename__ = 'ship_order'
 
     index = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ship_ID = db.Column(db.String(14), unique=True)
-    order_ID = db.Column(db.String(10), nullable=True)
+    ship_ID = db.Column(db.String(255), unique=True)
+    order_ID = db.Column(db.String(15), nullable=True)
     to_order_ID = db.Column(db.Integer, db.ForeignKey('delivery_order.index'), nullable=True)
     contact_info = db.Column(db.String(255), nullable=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)

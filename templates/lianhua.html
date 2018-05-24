@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="content-type">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/gijgo@1.9.6/js/gijgo.min.js" type="text/javascript"></script>
+	<link href="https://cdn.jsdelivr.net/npm/gijgo@1.9.6/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.js"></script>
+
+	<title>市面物流配送填單系統</title>
+	<script type="text/javascript" src="js/papaparse.min.js"></script>
+	<script type="text/javascript" src="js/moment.min.js"></script>
+	<script type="text/javascript" src="js/rawdata.js"></script>
+	<script type="text/javascript" src="js/lianhua/lianhua_controller.js"></script>
+	<script type="text/javascript" src="js/lianhua/lianhua_ext.js"></script>
+	<script type="text/javascript" src="js/lianhua/lianhua_rawdata.js"></script>
+	
+</head>
+<body>
+	<!-- 上方導覽列 -->
+	<!--<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">-->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<a class="navbar-brand" href="index.html">駿騰物流填單系統</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			  <span class="navbar-toggler-icon"></span>
+			</button>  
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+					<a class="nav-link" href="index.html">首頁 <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						市面物流出貨單
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="kuo.html">郭元益</a>
+						<a class="dropdown-item" href="lianhua.html">聯華</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item disabled" href="#">旺家</a>
+						<a class="dropdown-item disabled" href="#">立信</a>
+						<a class="dropdown-item disabled" href="#">信可</a>
+						<a class="dropdown-item disabled" href="#">森永</a>
+						<a class="dropdown-item disabled" href="#">掬水軒</a>
+						<a class="dropdown-item disabled" href="#">華元</a>
+						<a class="dropdown-item disabled" href="#">芮程</a>
+						<a class="dropdown-item disabled" href="#">中祥</a>
+					</div>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						南北物流
+						</a>
+						<div class="dropdown-menu disabled" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">聯華</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#">Something else here</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+	</nav>
+	<!-- 下方填單頁 -->
+	<div class="jumbotron text-center">
+		<h1>聯華出貨單</h1>
+		<p>請依次填入需要的資訊</p> 
+	</div>
+	<div class="container" ng-app="lianhua_form" ng-controller="formCtrl" >
+		<form id="order_form" ng-submit="submitForm()">
+			<input type="file" class="btn btn-info "  id="files" multiple> 
+			<input type="button" class="btn btn-lg btn-info " id="cal_fee" value="上傳" ng-model="rawdata" ng-click="parseFiles()" />
+			<table id="ship_table" class="table order-list table-responsive-sm">
+				<thead class="thead-light">
+					<tr>
+						<th rowspan="2">#</th>
+						<th>送貨車次</th>
+						<th>司機姓名</th><th></th>
+						<th>日期</th>
+						<th>送貨地點</th>
+						<th>單據號碼</th>
+						<th>材積數(立方米)</th>
+						<th>運費</th>
+					</tr>
+				</thead>
+				<tbody id="tblShipContent" ng-repeat="ship in lianhuas">	
+					<tr>
+						<th valign="center" rowspan="0">{{$index+1}}</th>
+						<td>
+							{{ ship.order_ID }}
+						</td>
+						<td>	
+							<select 
+								ng-model="ship.driver" 
+								ng-options="drivers for drivers in drivers" 
+								class="form-control custom-select"
+								style="width:auto;" 
+								multiple="true"
+								required/>
+							</select>
+						</td>
+						<td>
+							<textarea type="text" class="form-control" rows="4" 
+								ng-list="&#10;" 
+								ng-model="ship.driver" 
+								style="width:97px;" 
+								readonly>
+							</textarea>
+						</td>
+						<td	style="width:11%" >
+							揀貨：{{ ship.pickupdate | date:'MM-dd'}}
+							<br>
+							送貨：{{ ship.shipdate | date:'MM-dd' }}
+						</td>
+						<td>
+							{{ship.contact_info}}
+							<br>
+							({{ship.ship_area}}{{ship.ship_district}})
+						</td>
+						<td>
+							<textarea type="text" class="form-control" rows="4"  
+							style="width:144px;" 
+							ng-list="&#10;" 
+							ng-model="ship.ship_ID" 
+							readonly></textarea>
+						</td>
+						<td>
+							{{ ship.good_size.toFixed(4) }}
+						</td>
+						<td>
+							<input type="text" id="deliveryFee" 
+							style="width:100px;" 
+							ng-model="ship.delivery_fee" 
+							required>
+						</td>
+					</tr>
+					<tr>
+						<th>備註</th>
+						<td  colspan="7">
+						<textarea class="form-control" id="commentText" rows="2" ng-model="ship.comment"></textarea>
+						</td>
+					</tr>
+				<!--
+					<tr ng-repeat="row in lianhuas">
+						<td ng-repeat="(key, value) in row">{{row[key]}}</td>
+					</tr>
+				-->
+				</tbody>
+				<tfoot>
+				</tfoot>
+			</table>
+			<button type="submit" 
+			id="submit_btn"
+			class="btn btn-primary" 
+			ng-model="lianhuas" 
+			ng-click="validateNcal(lianhuas)"
+			>單據送出</button>
+		</form>
+	</div>
+</body></html>
