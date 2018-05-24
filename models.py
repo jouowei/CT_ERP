@@ -48,7 +48,7 @@ class Shippment(db.Model):
     __tablename__ = 'ship_order'
 
     index = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ship_ID = db.Column(db.String(255), unique=True)
+    ship_ID = db.Column(db.String(255))
     order_ID = db.Column(db.String(15), nullable=True)
     to_order_ID = db.Column(db.Integer, db.ForeignKey('delivery_order.index'), nullable=True)
     contact_info = db.Column(db.String(255), nullable=True)

@@ -43,11 +43,6 @@ myApp.controller('formCtrl', function($scope,$http,myService) {
 				},
 				complete: function(){             
 					$scope.lianhuas = myService.cleanData();
-					setTimeout(function(){
-						$("#tblShipContent").focus();
-						$("#tblShipContent").trigger("click");
-					}, 2000);
-					
 				}
 			});
 		}
@@ -66,8 +61,9 @@ myApp.controller('formCtrl', function($scope,$http,myService) {
 		var arrFinalData = [];
 		rawdata.forEach(function(x,index){
 			console.log("calcuating order #"+index+"...");
-			var submitOrder = order;
+			var submitOrder;
 			var submitShips = [];
+			submitOrder = new order();
 			submitOrder.order_ID = x.order_ID;
 			submitOrder.delivery_date = x.pickupdate;
 			submitOrder.client_name = x.contact_info;
@@ -75,7 +71,7 @@ myApp.controller('formCtrl', function($scope,$http,myService) {
 			submitOrder.delivery_fee = x.delivery_fee;
 			submitOrder.comment = x.comment;
 			x.driver.forEach(i =>{
-				var submitShip = ship;
+				var submitShip = new ship();
 				submitShip.ship_driver = i;
 				submitShip.ship_ID = x.ship_ID.toString();
 				submitShip.ship_datetime = x.shipdate;
@@ -102,7 +98,7 @@ myApp.controller('formCtrl', function($scope,$http,myService) {
             $http({
                 url: SUBMIT_ORDER_API,                         
                 method: "POST",
-                data: arrFinalData,
+                data: JSON.stringify(arrFinalData),
                 headers:{'Content-Type': 'application/json','Access-Control-Allow-Origin': '*' }
             })
             .then(function(response) {

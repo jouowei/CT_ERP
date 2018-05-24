@@ -16,25 +16,25 @@ var lianhua = function(){
 };
 
 //出貨單schema
-var order = {
-    business_type:'聯華',       //出貨單類型
-    delivery_date:'',           //揀貨日期 (上游取貨) (新增)
-    client_name:'',             //客戶名稱
-    order_ID:'',                //出貨單號
-    ships:'',                   //送貨單 (見下方ships)
-    delivery_fee:'',            //運費
-    good_size:'',               //材積 (CBM) (新增)
-    comment:''                  //出貨單備註
+var order = function(){ 
+    this.business_type = '聯華';       //出貨單類型
+    this.delivery_date = '';           //揀貨日期 (上游取貨) (新增)
+    this.client_name = '';             //客戶名稱
+    this.order_ID = '';                //出貨單號
+    this.ships = '';                   //送貨單 (見下方ships)
+    this.delivery_fee = '';            //運費
+    this.good_size = '';               //材積 (CBM) (新增)
+    this.comment = '';                 //出貨單備註
 };
 //送貨單schema
-var ship = {
-ship_ID:'',         //送貨單號
-ship_driver:'',     //司機姓名
-ship_deleted:'',    //此單狀態 (''=正常,'1'=刪除)
-ship_datetime:'',   //出貨日期 (送到客戶端)
-contact_info:'',    //客戶連絡電話 or 地址
-ship_area:'',       //縣市
-ship_district:'',   //區域
+var ship = function(){ 
+    this.ship_ID = '';         //送貨單號
+    this.ship_driver = '';     //司機姓名
+    this.ship_deleted = '';    //此單狀態 (''=正常,'1'=刪除)
+    this.ship_datetime = '';   //出貨日期 (送到客戶端)
+    this.contact_info = '';    //客戶連絡電話 or 地址
+    this.ship_area = '';       //縣市
+    this.ship_district = '';   //區域
 };
  
 //聯華用(客戶類型)

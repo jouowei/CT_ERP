@@ -61,7 +61,7 @@ def add_order_new(rawdata):
     else:
         return 'Error: unfound key "order_ID"'
     clientname = checkKey(rawdata,'clientname')
-    businesstype = checkKey(rawdata,'businesstype')
+    business_type = checkKey(rawdata,'business_type')
     delivery_date = checkKey(rawdata,'delivery_date')
     delivery_fee = checkKey(rawdata,'delivery_fee')
     car_type = checkKey(rawdata,'car_type')
@@ -85,7 +85,9 @@ def add_order_new(rawdata):
         floors_byhand = checkKey(ship,'floors_byhand')
         amount_collect = checkKey(ship,'amount_collect')
         ship_comment = checkKey(ship,'comment')
-        result_ship = Shippment.query.with_for_update().filter_by(ship_ID=ship_ID).first()
+        result_ship = Shippment.query.with_for_update().filter_by(ship_ID=ship_ID,driver=driver).first()
+            # 取消檢查ship_ID是否重複，但是以下廠商在傳入時，須確保ship_ID是唯一的:
+            #   1.郭元益
         if result_ship is None: 
             arrShippment.append(Shippment(ship_ID,order_ID,contact_info,ship_orderStore,ship_datetime,ship_area,ship_district,driver,car_type,car_ID,is_elevator,floors_byhand,amount_collect,ship_comment))
         
@@ -93,7 +95,7 @@ def add_order_new(rawdata):
     result_delivery = Delivery.query.with_for_update().filter_by(order_ID=order_ID).first()
     # 資料庫沒有此Order => 新增Order
     if result_delivery is None:
-        new_delivery = Delivery(businesstype,order_ID,clientname,delivery_date,delivery_fee,good_size,comment)
+        new_delivery = Delivery(business_type,order_ID,clientname,delivery_date,delivery_fee,good_size,comment)
         try:
             db.session.add(new_delivery)
             db.session.commit()
@@ -110,7 +112,7 @@ def add_order_new(rawdata):
                     db.session.rollback()
                     raise
         else:
-            return 'Error: no shippment in this order'
+            return 'Error: no shippment or shippment duplicated'
         return '新增成功'
     else: 
         return 'Notice: This order already exists'
@@ -121,7 +123,7 @@ def acceptPOST():
     if request.json:
         rawdata = request.get_json(force=True)
         # 透過檢查order_ID來確定這是array of jsons還是json
-        if len(rawdata) > 1 and len(checkKey(rawdata,'order_ID')) == 0:
+        if len(checkKey(rawdata,'order_ID')) == 0:
             result = ""
             for data in rawdata:
                 result = add_order_new(data)
@@ -146,7 +148,7 @@ def add_order():
         else:
             return 'Error: unfound key "order_ID"'
         clientname = checkKey(rawdata,'clientname')
-        businesstype = checkKey(rawdata,'businesstype')
+        businesstype = checkKey(rawdata,'business_type')
         delivery_date = checkKey(rawdata,'delivery_date')
         delivery_fee = checkKey(rawdata,'delivery_fee')
         car_type = checkKey(rawdata,'car_type')
@@ -160,20 +162,25 @@ def add_order():
                 ship_ID = checkKey(ship,'ship_ID')
             else:
                 return 'Error: unfound key "ship_ID"'
+            if len(checkKey(ship,'ship_driver')) > 0 :
+                driver = checkKey(ship,'ship_driver')
+            else:
+                return 'Error: unfound key "driver"'
             contact_info = checkKey(ship,'contact_info')
             ship_orderStore = checkKey(ship,'ship_orderStore')
             ship_datetime = checkKey(ship,'ship_datetime')
             ship_area = checkKey(ship,'ship_area')
             ship_district = checkKey(ship,'ship_district')
-            driver = checkKey(ship,'ship_driver')
             is_elevator = checkKey(ship,'is_elevator')
             floors_byhand = checkKey(ship,'floors_byhand')
             amount_collect = checkKey(ship,'amount_collect')
             ship_comment = checkKey(ship,'comment')
-            result_ship = Shippment.query.with_for_update().filter_by(ship_ID=ship_ID).first()
+            result_ship = Shippment.query.with_for_update().filter_by(ship_ID=ship_ID,driver=driver).first()
+            # 取消檢查ship_ID是否重複，但是以下廠商在傳入時，須確保ship_ID是唯一的:
+            #   1.郭元益
             if result_ship is None: 
                 arrShippment.append(Shippment(ship_ID,order_ID,contact_info,ship_orderStore,ship_datetime,ship_area,ship_district,driver,car_type,car_ID,is_elevator,floors_byhand,amount_collect,ship_comment))
-        
+
         # 查詢此Order是否已存在
         result_delivery = Delivery.query.with_for_update().filter_by(order_ID=order_ID).first()
         # 資料庫沒有此Order => 新增Order
@@ -195,7 +202,7 @@ def add_order():
                         db.session.rollback()
                         raise
             else:
-                return 'Error: no shippment in this order'
+                return 'Error: no shippment or shippment duplicated'
             return '新增成功'
         else: 
             return 'Notice: This order already exists'
